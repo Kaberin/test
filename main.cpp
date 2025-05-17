@@ -1,52 +1,79 @@
+/**
+ * @file main.cpp
+ * @author Vyacheslav (you@domain.com)
+ * @brief Вычисление пересечения отрезков. Функция Intersect возвращает точку если есть пересечения и точку с координанами nan если его нет.
+ * @version 0.1
+ * @date 16-05-2025
+ *
+ * @copyright Copyright (c) 2025
+ *
+ */
+
 #include <iostream>
 #include <cmath>
 #include <iomanip>
 #include <vector>
+
+constexpr double eps = 10e-6;
+
 class Vector3D {
-public:
     double X;
     double Y;
     double Z;
+public:
+    double getX() const
+    {
+        return X;
+    }
+    double getY() const
+    {
+        return Y;
+    }
+    double getZ() const
+    {
+        return Z;
+    }
+
     Vector3D(double x = 0, double y = 0, double z = 0) : X{ x }, Y{ y }, Z{ z } {};
-    double dot_product(const Vector3D& v)
+    double dot_product(const Vector3D& v) const
     {
         return { v.X * X + v.Y * Y + v.Z * Z };
     }
 
-    Vector3D cross_product(const Vector3D& v)
+    Vector3D cross_product(const Vector3D& v) const
     {
         Vector3D result{ Y * v.Z - Z * v.Y, -(X * v.Z - Z * v.X), X * v.Y - Y * v.X };
         return result;
     }
 
-    Vector3D operator-(const Vector3D& v)
+    Vector3D operator-(const Vector3D& v) const
     {
         return { X - v.X, Y - v.Y, Z - v.Z };
     }
 
-    Vector3D operator+(const Vector3D& v)
+    Vector3D operator+(const Vector3D& v) const
     {
         return { X + v.X, Y + v.Y, Z + v.Z };
     }
-    Vector3D operator*(double factor)
+    Vector3D operator*(double factor) const
     {
         return { X * factor, Y * factor, Z * factor };
     }
-    bool operator ==(const Vector3D& v)
+    bool operator ==(const Vector3D& v) const
     {
-        return (v.X == X) && (v.Y == Y) && (v.Z == Z);
+        return ((v.X - X) <= eps) && ((v.Y - Y) <= eps) && ((v.Z - Z) <= eps);
     }
-    bool operator !=(const Vector3D& v)
+    bool operator !=(const Vector3D& v) const
     {
         return !(*this == v);
     }
 
-    double length()
+    double length() const
     {
         double len = sqrt(X * X + Y * Y + Z * Z);
         return len;
     }
-    bool is_nan()
+    bool is_nan() const
     {
         if (std::isnan(X) || std::isnan(Y) || std::isnan(Z))
         {
@@ -57,9 +84,9 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Vector3D& v);
 };
 
-std::ostream& operator<<(std::ostream& os, Vector3D& v)
+std::ostream& operator<<(std::ostream& os, const Vector3D& v)
 {
-    os << "X = " << v.X << ", Y = " << v.Y << ", Z = " << v.Z;
+    os << "X = " << v.getX() << ", Y = " << v.getY() << ", Z = " << v.getZ();
     return os;
 }
 
@@ -67,7 +94,6 @@ class Segment3D {
     Vector3D start;
     Vector3D end;
     friend Vector3D Intersect(Segment3D s1, Segment3D s2);
-
 public:
     Segment3D(Vector3D s, Vector3D e) : start{ s }, end{ e } {}
 };
@@ -79,8 +105,6 @@ double round_to_n(double value, int n)
 }
 Vector3D Intersect(Segment3D s1, Segment3D s2)
 {
-
-    double eps = 10e-6;
     Vector3D P1 = s1.start;
     Vector3D P2 = s1.end;
     Vector3D Q1 = s2.start;
@@ -252,16 +276,14 @@ void test_intersection()
 
 
 
-    std::cout << "Testing ended. Tests passed: " << test_passed << ", Tests failed " << test_failed << '\n';
+    std::cout << "Testing ended. Tests passed: " << test_passed << ", Tests failed: " << test_failed << '\n';
 }
 
 
 int main()
 {
 
-
     test_intersection();
-
 
     return 0;
 }
